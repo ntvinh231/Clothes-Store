@@ -7,17 +7,20 @@ import connection from './src/database/connection.js';
 import cookieParser from 'cookie-parser';
 import AppError from './src/util/appError.js';
 import httpError from 'http-errors';
+import fileUpload from 'express-fileupload';
 const app = express();
 dotenv.config();
 
 const port = process.env.PORT || 8888;
 const hostname = process.env.HOST_NAME;
-
+//config file upload
+app.use(fileUpload({ createParentPath: true }));
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.use('/api', userRouter, productRouter);
+app.use('/api/user', userRouter);
+app.use('/api', productRouter);
 //404 handler and pass to errror handler
 app.all('*', (req, res, next) => {
 	return next(httpError(404, `Can't find ${req.originalUrl} on this server!`));

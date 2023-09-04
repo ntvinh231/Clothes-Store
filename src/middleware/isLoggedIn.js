@@ -9,11 +9,12 @@ const isLoggedIn = async (req, res, next) => {
 		const currentUser = await User.findById(decoded.id);
 		if (!currentUser) return next(httpError(401, 'The user belonging to this does no longer exists'));
 		//4. Check if user changed password after JWT was issued
-
+		if (currentUser.isPasswordChanged(decoded.iat))
+			return next(httpError(401, 'User recently changed password! Please log in again'));
 		req.user = currentUser;
 		next();
 	} else {
-		next(httpError(401, 'You are not logged in! Please log in to get access'));
+		return next(httpError(401, 'You are not logged in! Please log in to get access'));
 	}
 };
 
